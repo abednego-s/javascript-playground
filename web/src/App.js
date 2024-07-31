@@ -12,39 +12,60 @@ function App() {
 
   useEffect(() => {
     wsRef.current = new WebSocket("ws://localhost:8081/")
-
     wsRef.current.onopen = function () {
       console.log("connected to server")
     }
   }, [])
 
-  function sendDataToWs() {
-    wsRef.current.send(html)
+  function sendStaticHtmlToWebSocketServer() {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, "text/html")
+    const head = doc.getElementsByTagName("head")[0]
+
+    const styleElement = document.createElement("style")
+    styleElement.textContent = `\n${css}`
+    head.appendChild(styleElement)
+
+    const scriptElement = document.createElement("script")
+    scriptElement.textContent = `\n${javascript}`
+    head.appendChild(scriptElement)
+
+    const serializer = new XMLSerializer();
+    const updatedHtml = serializer.serializeToString(doc)
+    wsRef.current.send(updatedHtml)
   }
 
   return (
     <div>
       <h1>Welcome to Javascript Playground!</h1>
-      <button onClick={sendDataToWs}>Test</button>
       <div style={{ display: "flex" }}>
         <div style={{ flexGrow: "1" }}>
           <TextEditor
             value={html}
-            onChange={(value) => setHtml(value)}
+            onChange={(value) => {
+              sendStaticHtmlToWebSocketServer()
+              setHtml(value)
+            }}
             extensions={[LangHtml()]}
             height="200px"
           />
           <hr />
           <TextEditor
             value={javascript}
-            onChange={(value) => setJavascript(value)}
+            onChange={(value) => {
+              sendStaticHtmlToWebSocketServer()
+              setJavascript(value)
+            }}
             extensions={[LangJavascript()]}
             height="200px"
           />
           <hr />
           <TextEditor
             value={css}
-            onChange={(value) => setCss(value)}
+            onChange={(value) => {
+              sendStaticHtmlToWebSocketServer()
+              setCss(value)
+            }}
             extensions={[LangCss()]}
             height="200px"
           />
