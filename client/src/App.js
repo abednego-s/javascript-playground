@@ -6,7 +6,7 @@ import TextEditor from './TextEditor';
 
 function App() {
   const [html, setHtml] = useState(`<html>\n<head>\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello world!</h1>\n</body>\n</html>`)
-  const [js, setJs] = useState(`console.log('hello world!');`)
+  const [javascript, setJavascript] = useState(`console.log('hello world!');`)
   const [css, setCss] = useState(`h1 {\n\tbackground: green; \n}`)
 
   return (
@@ -20,8 +20,8 @@ function App() {
       />
       <hr />
       <TextEditor
-        value={js}
-        onChange={(value) => setJs(value)}
+        value={javascript}
+        onChange={(value) => setJavascript(value)}
         extensions={[LangJavascript()]}
         height="200px"
       />
