@@ -8,8 +8,8 @@ const template = require("@babel/template").default;
 const LOG_VARIABLE_NAME = "JSPlaygroundLog"
 const LOG_FUNCTION_NAME = "JSPlaygroundConsoleLog"
 
-function exec(code) {
-  const ast = parseSync(code)
+function transformScript(script) {
+  const ast = parseSync(script)
 
   traverse(ast, {
     Program(path) {
@@ -31,26 +31,6 @@ function exec(code) {
     },
     CallExpression(path) {
       const { node } = path
-      const args = []
-      const argn = []
-
-      node.arguments.forEach((arg) => {
-        if (t.isLiteral(arg)) {
-          args.push(arg.value)
-        } else if (t.isIdentifier(arg)) {
-          args.push(arg.name)
-          argn.push(arg.name)
-        } else if (t.isCallExpression(arg)) {
-          args.push(arg.callee.name + "()")
-          argn.push(arg.callee.name)
-        } else if (t.isArrayExpression(arg)) {
-          console.log("ArrayExpression is not supported")
-        } else if (t.isObjectExpression(arg)) {
-          console.log("ObjectExpression is not supported")
-        } else if (t.isBinaryExpression(arg)) {
-          console.log("BinaryExpression is not supported")
-        }
-      })
 
       function isConsoleLog(node) {
         return (
@@ -61,6 +41,32 @@ function exec(code) {
       }
 
       if (isConsoleLog(node)) {
+        const args = []
+        const argn = []
+
+        node.arguments.forEach((arg) => {
+          if (t.isLiteral(arg)) {
+            if (t.isStringLiteral(arg)) {
+              args.push(`'${arg.value}'`)
+            } else {
+              args.push(arg.value)
+            }
+          } else if (t.isIdentifier(arg)) {
+            args.push(arg.name)
+            argn.push(arg.name)
+          } else if (t.isCallExpression(arg)) {
+            console.log("CallExpression", arg)
+            // args.push(arg.callee.name + "()")
+            // argn.push(arg.callee.name)
+          } else if (t.isArrayExpression(arg)) {
+            console.log("ArrayExpression is not supported")
+          } else if (t.isObjectExpression(arg)) {
+            console.log("ObjectExpression is not supported")
+          } else if (t.isBinaryExpression(arg)) {
+            console.log("BinaryExpression is not supported")
+          }
+        })
+
         const buildNewFunction = template(`
           %%LOG_FUNCTION_NAME%%(new Function(...%%ARGS%%, %%FUNCTION_BODY%%)(...%%IDENTIFERS%%))
         `)
@@ -78,20 +84,19 @@ function exec(code) {
   })
 
   const result = generate(ast)
-  console.log(result.code)
   const functionBody = `${result.code} return ${LOG_VARIABLE_NAME}`
   const fn = new Function(functionBody)
   return fn()
 }
 
-console.log("output: ", exec(`
-  console.log(1 + 2)
-`))
+// console.log("output: ", transformScript(`
+//   console.log('hello!')
+// `))
 
-// exec(`
+// transformScript(`
 //   const x = "hello"
 //   const y = "world"
 //   console.log("hello")
 // `)
 
-// module.exports = exec
+module.exports = transformScript

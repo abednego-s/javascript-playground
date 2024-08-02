@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { html as LangHtml } from '@codemirror/lang-html';
 import { javascript as LangJavascript } from '@codemirror/lang-javascript';
 import { css as LangCss } from '@codemirror/lang-css';
@@ -8,16 +8,27 @@ function App() {
   const [html, setHtml] = useState(`<html>\n<head>\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello world!</h1>\n</body>\n</html>`)
   const [javascript, setJavascript] = useState(`console.log('hello world!');`)
   const [css, setCss] = useState(`h1 {\n\tbackground: green; \n}`)
-  const wsRef = useRef(null)
+  const [ws, setWs] = useState(null)
+  const [consoleLogs, setConsoleLogs] = useState(null)
 
   useEffect(() => {
-    wsRef.current = new WebSocket("ws://localhost:8081/")
-    wsRef.current.onopen = function () {
-      console.log("connected to server")
+    const websocket = new WebSocket("ws://localhost:8081/")
+
+    websocket.onopen = function () {
+      console.info("Web app is connected to WebSocket server")
+      setWs(websocket)
+    }
+    websocket.onmessage = function (e) {
+      const parsed = JSON.parse(e.data)
+      setConsoleLogs(parsed)
+    }
+
+    return () => {
+      websocket.close()
     }
   }, [])
 
-  function sendStaticHtmlToWebSocketServer() {
+  function sendPageToWebSocketServer() {
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, "text/html")
     const head = doc.getElementsByTagName("head")[0]
@@ -32,18 +43,26 @@ function App() {
 
     const serializer = new XMLSerializer();
     const updatedHtml = serializer.serializeToString(doc)
-    wsRef.current.send(updatedHtml)
+    const request = { type: "page", message: updatedHtml }
+    ws.send(JSON.stringify(request))
+  }
+
+  function sendScriptToWebSocketServer() {
+    const request = { type: "script", message: javascript }
+    ws.send(JSON.stringify(request))
   }
 
   return (
     <div>
       <h1>Welcome to Javascript Playground!</h1>
+      <div><button onClick={sendPageToWebSocketServer}>Run code</button></div>
+      <div><button onClick={sendScriptToWebSocketServer}>Run JS</button></div>
       <div style={{ display: "flex" }}>
         <div style={{ flexGrow: "1" }}>
           <TextEditor
             value={html}
             onChange={(value) => {
-              sendStaticHtmlToWebSocketServer()
+              // sendPageToWebSocketServer()
               setHtml(value)
             }}
             extensions={[LangHtml()]}
@@ -53,7 +72,7 @@ function App() {
           <TextEditor
             value={javascript}
             onChange={(value) => {
-              sendStaticHtmlToWebSocketServer()
+              // sendPageToWebSocketServer()
               setJavascript(value)
             }}
             extensions={[LangJavascript()]}
@@ -63,7 +82,7 @@ function App() {
           <TextEditor
             value={css}
             onChange={(value) => {
-              sendStaticHtmlToWebSocketServer()
+              // sendPageToWebSocketServer()
               setCss(value)
             }}
             extensions={[LangCss()]}
@@ -72,6 +91,22 @@ function App() {
         </div>
         <div style={{ flexGrow: "1" }}>
           <iframe src="http://localhost:8082" width="100%" />
+          <div>
+            <h2>Console</h2>
+            <div>{JSON.stringify(consoleLogs)}</div>
+            {/* <ul>
+              {consoleLogs.map(
+                (log, index) =>
+                  <div key={index}>
+                    <div>
+                      {log.map((item, index) =>
+                        <span key={index}>{typeof item === "object" ? JSON.stringify(item) : item}</span>
+                      )}
+                    </div>
+                  </div>
+              )}
+            </ul> */}
+          </div>
         </div>
       </div>
     </div >
