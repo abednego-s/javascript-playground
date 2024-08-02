@@ -44,6 +44,32 @@ function transformScript(script) {
         const args = []
         const argn = []
 
+        function buildArrayExpression(expression) {
+          let _arguments = []
+          expression.elements.forEach((element) => {
+            if (t.isLiteral(element)) {
+              _arguments.push(element.value)
+            } else if (t.isIdentifier(element)) {
+              _arguments.push(element.name)
+              argn.push(element.name)
+            }
+          })
+          return `[${_arguments.join(", ")}]`
+        }
+
+        function buildBinaryExpression(expression) {
+          if (t.isLiteral(expression)) {
+            return expression.value
+          } else if (t.isIdentifier(expression)) {
+            argn.push(expression.name)
+            return expression.name
+          } else if (t.isArrayExpression(expression)) {
+            return buildArrayExpression(expression)
+          } else if (t.isObjectExpression(expression)) {
+            return "{}"
+          }
+        }
+
         node.arguments.forEach((arg) => {
           if (t.isLiteral(arg)) {
             if (t.isStringLiteral(arg)) {
@@ -55,15 +81,12 @@ function transformScript(script) {
             args.push(arg.name)
             argn.push(arg.name)
           } else if (t.isCallExpression(arg)) {
-            console.log("CallExpression", arg)
-            // args.push(arg.callee.name + "()")
-            // argn.push(arg.callee.name)
-          } else if (t.isArrayExpression(arg)) {
-            console.log("ArrayExpression is not supported")
-          } else if (t.isObjectExpression(arg)) {
-            console.log("ObjectExpression is not supported")
+            args.push(arg.callee.name + "()")
+            argn.push(arg.callee.name)
           } else if (t.isBinaryExpression(arg)) {
-            console.log("BinaryExpression is not supported")
+            const { left, right, operator } = arg
+            const expression = `${buildBinaryExpression(left)} ${operator} ${buildBinaryExpression(right)}`
+            args.push(expression)
           }
         })
 
@@ -84,13 +107,14 @@ function transformScript(script) {
   })
 
   const result = generate(ast)
+  // console.log(result.code)
   const functionBody = `${result.code} return ${LOG_VARIABLE_NAME}`
   const fn = new Function(functionBody)
   return fn()
 }
 
 // console.log("output: ", transformScript(`
-//   console.log('hello!')
+//   console.log(1 + true)
 // `))
 
 // transformScript(`
