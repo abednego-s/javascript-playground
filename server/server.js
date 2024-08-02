@@ -18,7 +18,6 @@ wss.on("connection", (ws) => {
     // console.log(`Received: ${message}`);
     try {
       const { type, message } = JSON.parse(data)
-      console.log("🚀 ~ ws.on ~ type:", type)
 
       if (type === "script") {
         const result = transformScript(`${message}`)
