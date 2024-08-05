@@ -39,6 +39,20 @@ describe("basic expression", () => {
     `
     expect(transformScript(code)).toStrictEqual([["bar"]])
   })
+
+  test("contains nested function", () => {
+    const code = `
+      function foo(myArg) {
+        return "foo" + myArg
+      } 
+
+      function bar() {
+        return "bar"
+      }
+      console.log(foo(bar()))
+    `
+    expect(transformScript(code)).toStrictEqual([["foobar"]])
+  })
 })
 
 describe("binary expression", () => {
@@ -68,6 +82,11 @@ describe("binary expression", () => {
   test("contains boolean", () => {
     const code = `console.log(1 + true)`
     expect(transformScript(code)).toStrictEqual([[2]])
+  })
+
+  test("[] + {}", () => {
+    const code = "console.log([] + {})"
+    expect(transformScript(code)).toStrictEqual([["[object Object]"]])
   })
 })
 
