@@ -1,7 +1,8 @@
 const express = require("express")
 const WebSocket = require("ws");
 const bodyParser = require("body-parser");
-const transformScript = require("./transform-script");
+// const transformScript = require("./transform-script");
+const runScript = require("./utils/run-script");
 const app = express()
 const wss = new WebSocket.Server({ port: 8081 });
 const PORT = process.env.PORT || 3000;
@@ -20,7 +21,14 @@ wss.on("connection", (ws) => {
       const { type, message } = JSON.parse(data)
 
       if (type === "script") {
-        const result = transformScript(`${message}`)
+        const result = runScript(`${message}`, (logs) => {
+          clients.forEach((client) => {
+            if (client === ws && client.readyState === WebSocket.OPEN) {
+              const response = { type: "script", message: logs }
+              client.send(JSON.stringify(response))
+            }
+          })
+        })
         clients.forEach((client) => {
           if (client === ws && client.readyState === WebSocket.OPEN) {
             const response = { type: "script", message: result }
