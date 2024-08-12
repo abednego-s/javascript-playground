@@ -1,7 +1,6 @@
 const express = require("express")
 const WebSocket = require("ws");
 const bodyParser = require("body-parser");
-// const transformScript = require("./transform-script");
 const runScript = require("./utils/run-script");
 const app = express()
 const wss = new WebSocket.Server({ port: 8081 });
@@ -12,37 +11,28 @@ app.use(bodyParser.json())
 const clients = []
 
 wss.on("connection", (ws) => {
-  // console.log("New client connected");
   clients.push(ws)
 
-  ws.on("message", (data) => {
-    // console.log(`Received: ${message}`);
-    try {
-      const { type, message } = JSON.parse(data)
+  process.on("uncaughtException", (error) => {
+    const response = { type: "error", message: error.message }
+    ws.send(JSON.stringify(response));
+  });
 
-      if (type === "script") {
-        const result = runScript(`${message}`, (logs) => {
-          clients.forEach((client) => {
-            if (client === ws && client.readyState === WebSocket.OPEN) {
-              const response = { type: "script", message: logs }
-              client.send(JSON.stringify(response))
-            }
-          })
-        })
+  process.on("unhandledRejection", (reason) => {
+    const response = { type: "error", message: reason.message }
+    ws.send(JSON.stringify(response));
+  });
+
+  ws.on("message", (data) => {
+    try {
+      runScript(`${data}`, (logs) => {
         clients.forEach((client) => {
-          if (client === ws && client.readyState === WebSocket.OPEN) {
-            const response = { type: "script", message: result }
+          if (client.readyState === WebSocket.OPEN) {
+            const response = { type: "logs", message: logs }
             client.send(JSON.stringify(response))
           }
         })
-      } else if (type === "page") {
-        clients.forEach((client) => {
-          if (client != ws && client.readyState === WebSocket.OPEN) {
-            const response = { type: "page", message }
-            client.send(JSON.stringify(response))
-          }
-        })
-      }
+      })
     } catch (error) {
       const response = { type: "error", message: `Error ${error}` }
       ws.send(JSON.stringify(response));

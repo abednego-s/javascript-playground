@@ -47,16 +47,22 @@ function App() {
     ws.send(JSON.stringify(request))
   }
 
-  function sendScriptToWebSocketServer() {
-    const request = { type: "script", message: javascript }
-    ws.send(JSON.stringify(request))
+  function sendScriptToWebSocketServer(code) {
+    // const request = { type: "script", message: code }
+    setConsoleLogs(null)
+    try {
+      console.log(`sending `, code, ` to ws`);
+      ws.send(code)
+    } catch (err) {
+      throw Error("Error ", err)
+    }
   }
 
   return (
     <div>
       <h1>Welcome to Javascript Playground!</h1>
       <div><button onClick={sendPageToWebSocketServer}>Run code</button></div>
-      <div><button onClick={sendScriptToWebSocketServer}>Run JS</button></div>
+      {/* <div><button onClick={sendScriptToWebSocketServer}>Run JS</button></div> */}
       <div style={{ display: "flex" }}>
         <div style={{ flexGrow: "1" }}>
           <TextEditor
@@ -72,8 +78,8 @@ function App() {
           <TextEditor
             value={javascript}
             onChange={(value) => {
-              // sendPageToWebSocketServer()
-              setJavascript(value)
+              sendScriptToWebSocketServer(value)
+              // setJavascript(value)
             }}
             extensions={[LangJavascript()]}
             height="200px"
@@ -90,7 +96,7 @@ function App() {
           />
         </div>
         <div style={{ flexGrow: "1" }}>
-          <iframe src="http://localhost:8082" width="100%" />
+          {/* <iframe src="http://localhost:8082" width="100%" /> */}
           <div>
             <h2>Console</h2>
             <div>{JSON.stringify(consoleLogs)}</div>

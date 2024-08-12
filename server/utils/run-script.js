@@ -1,10 +1,33 @@
-const orig = console.log
-export function runScript(script, callback) {
+const originalConsoleLog = console.log
+const originalSetTimeout = global.setTimeout
+const originalSetInterval = global.setInterval
+const timeouts = []
+const intervals = []
+
+global.setTimeout = function (fn, delay, ...args) {
+  const id = originalSetTimeout(fn, delay, ...args)
+  timeouts.push(id)
+  return id
+}
+
+global.setInterval = function (fn, delay, ...args) {
+  const id = originalSetInterval(fn, delay, ...args)
+  intervals.push(id)
+  return id
+}
+
+function runScript(script, callback = null) {
+  for (let timeout of timeouts) {
+    clearInterval(timeout)
+  }
+
+  timeouts.length = 0
+
   const logs = []
   const logProxy = new Proxy(logs, {
     set(target, property, value) {
       target[property] = value
-      if (Array.isArray(value)) {
+      if (callback && Array.isArray(value)) {
         callback(target)
       }
       return true
@@ -16,10 +39,12 @@ export function runScript(script, callback) {
 
   console.log = function () {
     const args = Array.from(arguments);
-    orig.apply(console, args)
+    originalConsoleLog.apply(console, args)
     logProxy.push(args)
   }
 
-  new Function(script)()
+  new Function(`${script}`)()
   return logs
 }
+
+module.exports = runScript

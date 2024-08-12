@@ -1,4 +1,3 @@
-// const runScript = require("../transform-script")
 const runScript = require("../utils/run-script")
 
 describe("basic expression", () => {
