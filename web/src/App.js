@@ -4,10 +4,11 @@ import { javascript as LangJavascript } from '@codemirror/lang-javascript';
 import { css as LangCss } from '@codemirror/lang-css';
 import TextEditor from './TextEditor';
 
+const html = `<html>\n<head>\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello World</h1>\n</body>\n</html>`
+const javascript = `console.log('hello world!');`
+const css = `h1 {\n\tbackground: green; \n}`
+
 function App() {
-  const [html, setHtml] = useState(`<html>\n<head>\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello world!</h1>\n</body>\n</html>`)
-  const [javascript, setJavascript] = useState(`console.log('hello world!');`)
-  const [css, setCss] = useState(`h1 {\n\tbackground: green; \n}`)
   const [ws, setWs] = useState(null)
   const [consoleLogs, setConsoleLogs] = useState(null)
 
@@ -15,7 +16,7 @@ function App() {
     const websocket = new WebSocket("ws://localhost:8081/")
 
     websocket.onopen = function () {
-      console.info("Web app is connected to WebSocket server")
+      console.log("Web app is connected to WebSocket server")
       setWs(websocket)
     }
     websocket.onmessage = function (e) {
@@ -47,15 +48,10 @@ function App() {
     ws.send(JSON.stringify(request))
   }
 
-  function sendScriptToWebSocketServer(code) {
-    // const request = { type: "script", message: code }
-    setConsoleLogs(null)
-    try {
-      console.log(`sending `, code, ` to ws`);
-      ws.send(code)
-    } catch (err) {
-      throw Error("Error ", err)
-    }
+  function broadcastContent(content) {
+    const channel = new BroadcastChannel("channel-1")
+    console.log("web send ", content)
+    channel.postMessage(content)
   }
 
   return (
@@ -67,10 +63,7 @@ function App() {
         <div style={{ flexGrow: "1" }}>
           <TextEditor
             value={html}
-            onChange={(value) => {
-              // sendPageToWebSocketServer()
-              setHtml(value)
-            }}
+            onChange={broadcastContent}
             extensions={[LangHtml()]}
             height="200px"
           />
@@ -78,8 +71,7 @@ function App() {
           <TextEditor
             value={javascript}
             onChange={(value) => {
-              sendScriptToWebSocketServer(value)
-              // setJavascript(value)
+              // sendScriptToWebSocketServer(value)
             }}
             extensions={[LangJavascript()]}
             height="200px"
@@ -89,14 +81,13 @@ function App() {
             value={css}
             onChange={(value) => {
               // sendPageToWebSocketServer()
-              setCss(value)
             }}
             extensions={[LangCss()]}
             height="200px"
           />
         </div>
         <div style={{ flexGrow: "1" }}>
-          {/* <iframe src="http://localhost:8082" width="100%" /> */}
+          <iframe src="http://localhost:3000/webview" width="100%" />
           <div>
             <h2>Console</h2>
             <div>{JSON.stringify(consoleLogs)}</div>

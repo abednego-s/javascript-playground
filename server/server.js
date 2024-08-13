@@ -1,12 +1,24 @@
 const express = require("express")
-const WebSocket = require("ws");
-const bodyParser = require("body-parser");
-const runScript = require("./utils/run-script");
+const WebSocket = require("ws")
+const bodyParser = require("body-parser")
+const path = require("path")
+const runScript = require("./utils/run-script")
+
 const app = express()
-const wss = new WebSocket.Server({ port: 8081 });
+const wss = new WebSocket.Server({ port: 8081 })
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json())
+app.use(express.static(path.join(__dirname, "public/web")))
+app.use(express.static(path.join(__dirname, "public/webview")))
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/web/index.html"))
+})
+
+app.get("/webview", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/webview/index.html"))
+})
 
 const clients = []
 

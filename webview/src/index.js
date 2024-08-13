@@ -1,14 +1,9 @@
 (function () {
-  const ws = new WebSocket("ws://localhost:8081/")
-
-  ws.onopen = function () {
-    console.log('Webview is connected to WebSocket')
-  }
-
-  ws.onmessage = function (e) {
-    const { message } = JSON.parse(e.data)
+  const channel = new BroadcastChannel("channel-1")
+  channel.onmessage = function (ev) {
     document.open()
-    document.write(message)
+    document.write(ev.data)
     document.close()
+    console.log("webview received: ", ev.data)
   }
 })()
