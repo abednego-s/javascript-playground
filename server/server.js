@@ -2,6 +2,8 @@ const express = require("express")
 const WebSocket = require("ws")
 const bodyParser = require("body-parser")
 const path = require("path")
+require("global-jsdom/register")
+
 const runScript = require("./utils/run-script")
 
 const app = express()

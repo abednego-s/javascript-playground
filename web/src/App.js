@@ -6,7 +6,7 @@ import TextEditor from './TextEditor';
 
 const html = `<html>\n<head>\n\t<title>Document</title>\n</head>\n<body>\n\t<h1>Hello World</h1>\n</body>\n</html>`
 const javascript = `console.log('hello world!');`
-const css = `h1 {\n\tbackground: green; \n}`
+const css = `h1 {\n\tcolor: green; \n}`
 
 function App() {
   const [ws, setWs] = useState(null)
@@ -16,7 +16,6 @@ function App() {
     const websocket = new WebSocket("ws://localhost:8081/")
 
     websocket.onopen = function () {
-      console.log("Web app is connected to WebSocket server")
       setWs(websocket)
     }
     websocket.onmessage = function (e) {
@@ -29,41 +28,24 @@ function App() {
     }
   }, [])
 
-  function sendPageToWebSocketServer() {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(html, "text/html")
-    const head = doc.getElementsByTagName("head")[0]
-
-    const styleElement = document.createElement("style")
-    styleElement.textContent = `\n${css}`
-    head.appendChild(styleElement)
-
-    const scriptElement = document.createElement("script")
-    scriptElement.textContent = `\n${javascript}`
-    head.appendChild(scriptElement)
-
-    const serializer = new XMLSerializer();
-    const updatedHtml = serializer.serializeToString(doc)
-    const request = { type: "page", message: updatedHtml }
-    ws.send(JSON.stringify(request))
+  function sendScriptToWsServer(code) {
+    setConsoleLogs(null)
+    ws.send(code)
   }
 
-  function broadcastContent(content) {
+  function broadcastContent(type, content) {
     const channel = new BroadcastChannel("channel-1")
-    console.log("web send ", content)
-    channel.postMessage(content)
+    channel.postMessage({ type, content })
   }
 
   return (
     <div>
       <h1>Welcome to Javascript Playground!</h1>
-      <div><button onClick={sendPageToWebSocketServer}>Run code</button></div>
-      {/* <div><button onClick={sendScriptToWebSocketServer}>Run JS</button></div> */}
       <div style={{ display: "flex" }}>
         <div style={{ flexGrow: "1" }}>
           <TextEditor
             value={html}
-            onChange={broadcastContent}
+            onChange={(value) => broadcastContent("html", value)}
             extensions={[LangHtml()]}
             height="200px"
           />
@@ -71,7 +53,8 @@ function App() {
           <TextEditor
             value={javascript}
             onChange={(value) => {
-              // sendScriptToWebSocketServer(value)
+              sendScriptToWsServer(value)
+              broadcastContent("javascript", value)
             }}
             extensions={[LangJavascript()]}
             height="200px"
@@ -79,9 +62,7 @@ function App() {
           <hr />
           <TextEditor
             value={css}
-            onChange={(value) => {
-              // sendPageToWebSocketServer()
-            }}
+            onChange={(value) => { broadcastContent("css", value) }}
             extensions={[LangCss()]}
             height="200px"
           />
