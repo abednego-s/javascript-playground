@@ -32,8 +32,8 @@ function App() {
   return (
     <div>
       <h1>Welcome to Javascript Playground!</h1>
-      <div style={{ display: "flex" }}>
-        <div style={{ flexGrow: "1" }}>
+      <div className="flex">
+        <div className="flex-grow">
           <TextEditor
             value={defaultScript}
             onChange={sendScriptToWsServer}
