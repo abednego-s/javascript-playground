@@ -1,4 +1,4 @@
-const runScript = require("../utils/run-script")
+const runScript = require("../server/utils/run-script")
 
 describe("basic expression", () => {
   test("literal string", () => {
