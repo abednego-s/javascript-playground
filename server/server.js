@@ -42,7 +42,7 @@ wss.on("connection", (ws) => {
         })
       })
     } catch (error) {
-      const response = { type: "error", message: `Error ${error}` }
+      const response = { type: "error", message: `${error}` }
       ws.send(JSON.stringify(response));
     }
   });

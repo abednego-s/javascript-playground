@@ -79,3 +79,44 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+html,
+body,
+#root {
+  height: 100vh;
+}
+
+.cm-editor {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+.cm-scroller {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.cm-theme-light,
+.cm-theme {
+  height: 100%;
+}
+
+.noto-sans-mono {
+  font-family: "Noto Sans Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.dm-sans {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}

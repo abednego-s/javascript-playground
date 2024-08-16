@@ -11,13 +11,10 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.?js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"]
-          }
         }
       },
       {
@@ -25,5 +22,11 @@ module.exports = {
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
     ]
+  },
+  resolve: {
+    extensions: [".js", ".jsx"],
+    alias: {
+      "@": path.resolve(__dirname, "./web/src")
+    }
   }
 };
