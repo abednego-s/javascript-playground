@@ -18,10 +18,15 @@ global.setInterval = function (fn, delay, ...args) {
 
 function runScript(script, callback = null) {
   for (let timeout of timeouts) {
-    clearInterval(timeout)
+    clearTimeout(timeout)
+  }
+
+  for (let interval of intervals) {
+    clearInterval(interval)
   }
 
   timeouts.length = 0
+  intervals.length = 0
 
   const logs = []
   const logProxy = new Proxy(logs, {
