@@ -8,6 +8,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Github } from "lucide-react";
 
 const defaultScript = `
 /**
@@ -66,10 +67,20 @@ function App() {
   return (
     <>
       <header className="bg-teal-500 text-white px-4 py-6">
-        <h1 className="text-2xl font-bold">
-          JS Playground — Write & run Javascript Code Online
-          <sup className="font-normal italic">(Beta)</sup>
-        </h1>
+        <nav className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">
+            JS Playground — Write & run Javascript Code Online
+            <sup className="font-normal italic">(Beta)</sup>
+          </h1>
+          <ul>
+            <a
+              href="https://github.com/abednego-s/javascript-playground"
+              className="w-12 h-12 border-2 border-white rounded-full flex items-center justify-center"
+            >
+              <Github size={28} />
+            </a>
+          </ul>
+        </nav>
       </header>
 
       <ResizablePanelGroup direction="horizontal">
