@@ -16,20 +16,26 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "web", "index.html"))
 })
 
+let wsServer = null
 const clients = []
+
+process.on("uncaughtException", (error) => {
+  const response = { type: "error", message: error.message }
+  if (wsServer) {
+    wsServer.send(JSON.stringify(response));
+  }
+});
+
+process.on("unhandledRejection", (reason) => {
+  const response = { type: "error", message: reason.message }
+  if (wsServer) {
+    wsServer.send(JSON.stringify(response));
+  }
+});
 
 wss.on("connection", (ws) => {
   clients.push(ws)
-
-  process.on("uncaughtException", (error) => {
-    const response = { type: "error", message: error.message }
-    ws.send(JSON.stringify(response));
-  });
-
-  process.on("unhandledRejection", (reason) => {
-    const response = { type: "error", message: reason.message }
-    ws.send(JSON.stringify(response));
-  });
+  wsServer = ws
 
   ws.on("message", (data) => {
     try {

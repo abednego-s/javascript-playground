@@ -7,41 +7,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Github } from "lucide-react";
-
-const defaultScript = `
-/**
- * Binary search
- */
-function binarySearch(arr, x) { 
-  let start = 0
-  let end = arr.length - 1; 
-
-  while (start <= end) { 
-    let mid = Math.floor((start + end) / 2); 
-
-    if (arr[mid] === x) {
-      return true
-    } else if (arr[mid] < x)  {
-      start = mid + 1; 
-    } else {
-      end = mid - 1; 
-    }     
-  } 
-  return false; 
-}
-
-
-let arr = [2, 3, 4, 10, 40]; 
-let x = 10; 
-
-console.log(binarySearch(arr, x)); 
-`;
+import { Output } from "@/components/output";
 
 function App() {
   const [ws, setWs] = useState(null);
-  const [consoleLogs, setConsoleLogs] = useState(null);
+  const [output, setOutput] = useState(null);
 
   useEffect(() => {
     const websocket = new WebSocket("ws://localhost:8081/");
@@ -51,7 +22,7 @@ function App() {
     };
     websocket.onmessage = function (e) {
       const parsed = JSON.parse(e.data);
-      setConsoleLogs(parsed);
+      setOutput(parsed);
     };
 
     return () => {
@@ -59,8 +30,14 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (ws) {
+      sendScriptToWsServer(defaultScript);
+    }
+  }, [ws]);
+
   function sendScriptToWsServer(code) {
-    setConsoleLogs(null);
+    setOutput(null);
     ws.send(code);
   }
 
@@ -95,51 +72,24 @@ function App() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <div className="bg-slate-200 h-screen">
-            <div className="p-5">
-              <span className="block text-lg font-bold mb-4">Output</span>
-              {consoleLogs ? (
-                <div
-                  className={`${
-                    consoleLogs?.type === "error"
-                      ? "text-red-400"
-                      : "text-slate-800"
-                  }`}
-                >
-                  <ScrollArea className="h-[600px] pb-40">
-                    {consoleLogs.message &&
-                    Array.isArray(consoleLogs.message) ? (
-                      <ul>
-                        {consoleLogs.message.map((log, index) => (
-                          <li key={index}>
-                            <div>
-                              {log.map((item, index) => (
-                                <span key={index}>
-                                  {typeof item === "object" ? (
-                                    <pre>
-                                      {JSON.stringify(item, null, "\t")}
-                                    </pre>
-                                  ) : (
-                                    item
-                                  )}
-                                </span>
-                              ))}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      consoleLogs.message
-                    )}
-                  </ScrollArea>
-                </div>
-              ) : null}
-            </div>
-          </div>
+          <Output output={output} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </>
   );
 }
+
+const defaultScript = `
+/**
+ * ===========================
+ * Write your Javascript code here and 
+ * see the output on the left panel.
+ * ===========================
+ */
+const hello = "hello";
+const world = "world";
+
+console.log(hello + " " + world)
+`;
 
 export default App;

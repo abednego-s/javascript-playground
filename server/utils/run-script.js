@@ -1,32 +1,9 @@
-const originalConsoleLog = console.log
-const originalSetTimeout = global.setTimeout
-const originalSetInterval = global.setInterval
-const timeouts = []
-const intervals = []
-
-global.setTimeout = function (fn, delay, ...args) {
-  const id = originalSetTimeout(fn, delay, ...args)
-  timeouts.push(id)
-  return id
-}
-
-global.setInterval = function (fn, delay, ...args) {
-  const id = originalSetInterval(fn, delay, ...args)
-  intervals.push(id)
-  return id
-}
+const { clearIntervals, clearTimeouts } = require("./extend-functions")
+const origConsoleLog = console.log
 
 function runScript(script, callback = null) {
-  for (let timeout of timeouts) {
-    clearTimeout(timeout)
-  }
-
-  for (let interval of intervals) {
-    clearInterval(interval)
-  }
-
-  timeouts.length = 0
-  intervals.length = 0
+  clearIntervals()
+  clearTimeouts()
 
   const logs = []
   const logProxy = new Proxy(logs, {
@@ -44,7 +21,7 @@ function runScript(script, callback = null) {
 
   console.log = function () {
     const args = Array.from(arguments);
-    originalConsoleLog.apply(console, args)
+    origConsoleLog.apply(console, args)
     logProxy.push(args)
   }
 
