@@ -15,7 +15,12 @@ function App() {
   const [output, setOutput] = useState(null);
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://localhost:8081/");
+    const isProduction = process.env.REACT_APP_ENV === "production";
+    let wsUrl = isProduction
+      ? "wss://"
+      : "ws://" + process.env.REACT_APP_WS_SERVER + "/";
+
+    const websocket = new WebSocket(wsUrl);
 
     websocket.onopen = function () {
       setWs(websocket);
@@ -32,7 +37,7 @@ function App() {
 
   useEffect(() => {
     if (ws) {
-      sendScriptToWsServer(defaultScript);
+      sendScriptToWsServer(sampleScript);
     }
   }, [ws]);
 
@@ -63,10 +68,9 @@ function App() {
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel>
           <CodeMirror
-            value={defaultScript}
+            value={sampleScript}
             onChange={sendScriptToWsServer}
             extensions={[javascript()]}
-            height="600px"
             theme={okaidia}
           />
         </ResizablePanel>
@@ -79,7 +83,7 @@ function App() {
   );
 }
 
-const defaultScript = `
+const sampleScript = `
 /**
  * ===========================
  * Write your Javascript code here and 

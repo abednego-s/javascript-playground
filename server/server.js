@@ -3,6 +3,7 @@ const WebSocket = require("ws")
 const bodyParser = require("body-parser")
 const path = require("path")
 const runScript = require("./utils/run-script")
+require("dotenv").config();
 require("global-jsdom/register")
 
 const app = express()
@@ -59,5 +60,5 @@ wss.on("connection", (ws) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server is running at port ${PORT}`);
 })
