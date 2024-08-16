@@ -1,12 +1,12 @@
 {
   "scripts": {
     "dev": "npm run server:dev & npm run web:dev",
+    "start": "npm run web:build & npm run server:start",
     "server:dev": "nodemon server/server.js",
     "server:start": "node server/server.js",
     "server:test": "jest",
     "web:dev": "webpack serve --config webpack.dev.js",
-    "web:build": "webpack --config webpack.prod.js",
-    "web:start": "serve -s dist"
+    "web:build": "webpack --config webpack.prod.js"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.3",
@@ -21,8 +21,6 @@
     "nodemon": "^3.1.4",
     "postcss-cli": "^11.0.0",
     "postcss-loader": "^8.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "serve": "^14.2.3",
     "style-loader": "^4.0.0",
     "tailwindcss": "^3.4.10",
@@ -52,6 +50,8 @@
     "global-jsdom": "24.0.0",
     "jsdom": "^24.1.1",
     "lucide-react": "^0.427.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-resizable-panels": "^2.0.23",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",

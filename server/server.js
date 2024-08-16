@@ -10,10 +10,10 @@ const wss = new WebSocket.Server({ port: 8081 })
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json())
-app.use(express.static(path.join(__dirname, "public/web")))
+app.use(express.static(path.join(__dirname, "..", "public", "web")))
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "/public/web/index.html"))
+  res.sendFile(path.join(__dirname, "..", "public", "web", "index.html"))
 })
 
 const clients = []

@@ -16,12 +16,14 @@ module.exports = merge(common, {
     rules: [
       {
         test: /\.css$/,
+        include: path.resolve(__dirname, "src"),
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },
   plugins: [
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
+    new MiniCssExtractPlugin()
   ],
   optimization: {
     minimize: true,

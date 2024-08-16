@@ -19,6 +19,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
+        include: path.resolve(__dirname, "web"),
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
     ]
