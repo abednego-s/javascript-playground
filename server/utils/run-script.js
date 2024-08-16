@@ -1,4 +1,6 @@
-const { clearIntervals, clearTimeouts } = require("./extend-functions")
+require("./extend-functions")
+const clearIntervals = require("./clear-intervals")
+const clearTimeouts = require("./clear-timeouts")
 const origConsoleLog = console.log
 
 function runScript(script, callback = null) {
