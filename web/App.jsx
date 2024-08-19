@@ -16,9 +16,14 @@ function App() {
 
   useEffect(() => {
     const isProduction = process.env.REACT_APP_ENV === "production";
-    let wsUrl = isProduction
-      ? "wss://"
-      : "ws://" + process.env.REACT_APP_WS_SERVER + "/";
+    console.log("🚀 ~ useEffect ~ isProduction:", isProduction);
+    const wsServer =
+      process.env.REACT_APP_WS_SERVER +
+      ":" +
+      process.env.REACT_APP_WS_SERVER_PORT +
+      "/";
+    let wsUrl = isProduction ? `wss://${wsServer}` : `ws://${wsServer}`;
+    console.log("🚀 ~ useEffect ~ wsUrl:", wsUrl);
 
     const websocket = new WebSocket(wsUrl);
 
