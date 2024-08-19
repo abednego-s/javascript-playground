@@ -4,6 +4,10 @@ const common = require("./webpack.common.js");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const dotenv = require("dotenv");
+const { EnvironmentPlugin } = require("webpack");
+
+dotenv.config()
 
 module.exports = merge(common, {
   mode: "production",
@@ -23,7 +27,8 @@ module.exports = merge(common, {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin()
+    new MiniCssExtractPlugin(),
+    new EnvironmentPlugin(["NODE_ENV", "REACT_APP_WS_SERVER", "REACT_APP_WS_SERVER_PORT"])
   ],
   optimization: {
     minimize: true,
