@@ -21,8 +21,6 @@ function App() {
       : `ws://${process.env.REACT_APP_WS_SERVER}:${process.env.REACT_APP_WS_SERVER_PORT}`;
 
     const websocket = new WebSocket(wsUrl);
-    console.log("🚀 ~ useEffect ~ isProduction:", isProduction);
-    console.log("🚀 ~ useEffect ~ wsUrl:", wsUrl);
 
     websocket.onopen = function () {
       setWs(websocket);
