@@ -3,6 +3,7 @@ const WebSocket = require("ws")
 const bodyParser = require("body-parser")
 const path = require("path")
 const runScript = require("./utils/run-script")
+const { createChannelName } = require("./utils/channels")
 require("dotenv").config();
 require("global-jsdom/register")
 
@@ -18,7 +19,7 @@ app.get("/", (req, res) => {
 })
 
 let wsServer = null
-const clients = []
+const clients = new Map()
 
 process.on("uncaughtException", (error) => {
   const response = { type: "error", message: error.message }
@@ -35,13 +36,19 @@ process.on("unhandledRejection", (reason) => {
 });
 
 wss.on("connection", (ws) => {
-  clients.push(ws)
+  const channelName = createChannelName()
+  if (clients.has(channelName)) {
+    clients.set(channelName, [...clients.get(channelName), ws])
+  } else {
+    clients.set(channelName, [ws])
+  }
+
   wsServer = ws
 
   ws.on("message", (data) => {
     try {
       runScript(`${data}`, (logs) => {
-        clients.forEach((client) => {
+        clients.get(channelName).forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             const response = { type: "logs", message: logs }
             client.send(JSON.stringify(response))
