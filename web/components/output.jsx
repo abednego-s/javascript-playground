@@ -29,7 +29,9 @@ export function Output({ output }) {
                       </li>
                     ))}
                   </ul>
-                ) : null
+                ) : (
+                  output.message
+                )
               ) : null}
             </ScrollArea>
           </div>
