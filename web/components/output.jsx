@@ -8,29 +8,29 @@ export function Output({ output }) {
         {output ? (
           <div
             className={`${
-              output?.type === "error" ? "text-red-400" : "text-slate-800"
+              output.type === "error" ? "text-red-400" : "text-slate-800"
             }`}
           >
             <ScrollArea className="h-[600px] pb-40">
-              {output.message && Array.isArray(output.message) ? (
-                <ul>
-                  {output.message.map((log, index) => (
-                    <li key={index}>
-                      {log.map((item, index) => (
-                        <span key={index}>
-                          {typeof item === "object" ? (
-                            <pre>{JSON.stringify(item, null, "\t")}</pre>
-                          ) : (
-                            String(item)
-                          )}
-                        </span>
-                      ))}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                output.message
-              )}
+              {output.message ? (
+                Array.isArray(output.message) ? (
+                  <ul>
+                    {output.message.map((log, index) => (
+                      <li key={index}>
+                        {log.map((item, index) => (
+                          <span key={index}>
+                            {typeof item === "object" ? (
+                              <pre>{JSON.stringify(item, null, "\t")}</pre>
+                            ) : (
+                              String(item)
+                            )}
+                          </span>
+                        ))}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null
+              ) : null}
             </ScrollArea>
           </div>
         ) : null}
