@@ -21,7 +21,7 @@ export function Output({ output }) {
                           {typeof item === "object" ? (
                             <pre>{JSON.stringify(item, null, "\t")}</pre>
                           ) : (
-                            item
+                            String(item)
                           )}
                         </span>
                       ))}
