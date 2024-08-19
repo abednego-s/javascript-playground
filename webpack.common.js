@@ -8,7 +8,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "web", "index.html"),
     }),
-    new Dotenv()
+    new Dotenv({
+      systemvars: true
+    })
   ],
   module: {
     rules: [
