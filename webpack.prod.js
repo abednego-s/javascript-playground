@@ -28,7 +28,7 @@ module.exports = merge(common, {
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin(),
-    new EnvironmentPlugin(["NODE_ENV", "REACT_APP_WS_SERVER", "REACT_APP_WS_SERVER_PORT"])
+    new EnvironmentPlugin(["REACT_APP_ENV", "REACT_APP_WS_SERVER", "REACT_APP_WS_SERVER_PORT"])
   ],
   optimization: {
     minimize: true,
