@@ -9,10 +9,12 @@ import {
 } from "@/components/ui/resizable";
 import { Github } from "lucide-react";
 import { Output } from "@/components/output";
+import { DisconnectedAlert } from "@/components/disconnected-alert";
 
 function App() {
   const [ws, setWs] = useState(null);
   const [output, setOutput] = useState(null);
+  const [isConnected, setConnected] = useState(true);
 
   useEffect(() => {
     const isProduction = process.env.REACT_APP_ENV === "production";
@@ -25,9 +27,14 @@ function App() {
     websocket.onopen = function () {
       setWs(websocket);
     };
+
     websocket.onmessage = function (e) {
       const parsed = JSON.parse(e.data);
       setOutput(parsed);
+    };
+
+    websocket.onclose = function (e) {
+      setConnected(false);
     };
 
     return () => {
@@ -48,16 +55,19 @@ function App() {
 
   return (
     <>
-      <header className="bg-teal-500 text-white px-4 py-6">
+      <header className="px-4 py-6">
         <nav className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">
-            JS Playground — Write & run Javascript Code Online
-            <sup className="font-normal italic">(Beta)</sup>
+          <h1 className="text-2xl">
+            <span className="text-red-500 font-bold">JS Playground</span>
+            <span className="text-slate-500">
+              {" "}
+              — Write & run Javascript Code
+            </span>
           </h1>
           <ul>
             <a
               href="https://github.com/abednego-s/javascript-playground"
-              className="w-12 h-12 border-2 border-white rounded-full flex items-center justify-center"
+              className="w-12 h-12 border-2 border-black rounded-full flex items-center justify-center"
             >
               <Github size={28} />
             </a>
@@ -79,6 +89,8 @@ function App() {
           <Output output={output} />
         </ResizablePanel>
       </ResizablePanelGroup>
+
+      {!isConnected ? <DisconnectedAlert /> : null}
     </>
   );
 }
