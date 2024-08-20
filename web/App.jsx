@@ -1,50 +1,80 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { javascript } from "@codemirror/lang-javascript";
 import CodeMirror from "@uiw/react-codemirror";
 import { okaidia } from "@uiw/codemirror-theme-okaidia";
+import { Code2, Github } from "lucide-react";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Github } from "lucide-react";
-import { Output } from "@/components/output";
-import { DisconnectedAlert } from "@/components/disconnected-alert";
+import { OutputPanel } from "@/components/output-panel";
+import { useToast } from "@/components/ui/use-toast";
 
 function App() {
   const [ws, setWs] = useState(null);
   const [output, setOutput] = useState(null);
-  const [isConnected, setConnected] = useState(true);
+  const [isRendered, setRendered] = useState(false);
+  const retryIntervalRef = useRef(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const isProduction = process.env.REACT_APP_ENV === "production";
+    const isProduction = process.env.REACT_APP_ENV === "production"; // NODE_ENV ??
     let wsUrl = isProduction
       ? `wss://${process.env.REACT_APP_WS_SERVER}`
       : `ws://${process.env.REACT_APP_WS_SERVER}:${process.env.REACT_APP_WS_SERVER_PORT}`;
 
-    const websocket = new WebSocket(wsUrl);
+    function connectToWs() {
+      const websocket = new WebSocket(wsUrl);
 
-    websocket.onopen = function () {
-      setWs(websocket);
-    };
+      websocket.onopen = function () {
+        setWs(websocket);
+        clearInterval(retryIntervalRef.current);
+        retryIntervalRef.current = null;
+      };
 
-    websocket.onmessage = function (e) {
-      const parsed = JSON.parse(e.data);
-      setOutput(parsed);
-    };
+      websocket.onmessage = function (e) {
+        const parsed = JSON.parse(e.data);
+        setOutput(parsed);
+      };
 
-    websocket.onclose = function (e) {
-      setConnected(false);
-    };
+      websocket.onclose = function () {
+        retryConnection();
+        showConnectionError();
+      };
+    }
+
+    function retryConnection() {
+      if (!retryIntervalRef.current) {
+        retryIntervalRef.current = setInterval(connectToWs, 5000);
+      }
+    }
+
+    function showConnectionError() {
+      toast({
+        variant: "destructive",
+        title: "Service has stopped",
+        description:
+          "Unable to run your code because the service is unavailable.",
+      });
+    }
+
+    connectToWs();
 
     return () => {
-      websocket.close();
+      ws?.close();
+      clearInterval(retryIntervalRef.current);
     };
   }, []);
 
   useEffect(() => {
+    if (isRendered) {
+      return;
+    }
+
     if (ws) {
       sendScriptToWsServer(sampleScript);
+      setRendered(true);
     }
   }, [ws]);
 
@@ -55,19 +85,21 @@ function App() {
 
   return (
     <>
-      <header className="px-4 py-6">
-        <nav className="flex justify-between items-center">
-          <h1 className="text-2xl">
-            <span className="text-red-500 font-bold">JS Playground</span>
-            <span className="text-slate-500">
-              {" "}
+      <header className="p-2">
+        <nav className="flex items-center justify-between">
+          <h1 className="flex text-2xl">
+            <span className="flex items-center font-bold text-red-500">
+              <Code2 />
+              <span className="ml-2">Javascript Playground</span>
+            </span>
+            <span className="ml-2 text-slate-500">
               — Write & run Javascript Code
             </span>
           </h1>
           <ul>
             <a
               href="https://github.com/abednego-s/javascript-playground"
-              className="w-12 h-12 border-2 border-black rounded-full flex items-center justify-center"
+              className="flex items-center justify-center w-12 h-12 border-2 border-black rounded-full"
             >
               <Github size={28} />
             </a>
@@ -86,11 +118,9 @@ function App() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <Output output={output} />
+          <OutputPanel output={output} />
         </ResizablePanel>
       </ResizablePanelGroup>
-
-      {!isConnected ? <DisconnectedAlert /> : null}
     </>
   );
 }
@@ -102,10 +132,10 @@ const sampleScript = `
  * see the output on the left panel.
  * ===========================
  */
-const hello = "hello";
-const world = "world";
+const hello = "hello"
+const world = " world"
 
-console.log(hello + " " + world)
+console.log(hello + world)
 `;
 
 export default App;

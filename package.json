@@ -1,4 +1,10 @@
 {
+  "name": "javascript-playground",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abednego-s/javascript-playground"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "npm run server:dev & npm run web:dev",
     "start": "npm run web:build && npm run server:start",
@@ -9,6 +15,7 @@
     "web:build": "webpack --config webpack.prod.js"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/preset-react": "^7.24.7",
     "autoprefixer": "^10.4.20",
@@ -32,18 +39,10 @@
     "webpack-merge": "^6.0.1"
   },
   "dependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/generator": "^7.25.0",
-    "@babel/template": "^7.25.0",
-    "@babel/traverse": "^7.25.3",
-    "@babel/types": "^7.25.2",
-    "@codemirror/lang-css": "^6.2.1",
-    "@codemirror/lang-html": "^6.4.9",
     "@codemirror/lang-javascript": "^6.2.2",
-    "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-scroll-area": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
     "@uiw/codemirror-theme-okaidia": "^4.23.0",
-    "@uiw/codemirror-theme-vscode": "^4.23.0",
     "@uiw/react-codemirror": "^4.23.0",
     "body-parser": "^1.20.2",
     "class-variance-authority": "^0.7.0",

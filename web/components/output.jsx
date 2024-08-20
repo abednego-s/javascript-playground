@@ -1,42 +1,12 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { OutputMessages } from "@/components/output-messages";
 
-export function Output({ output }) {
+export function Output({ isError, message }) {
   return (
-    <div className="bg-slate-200 h-screen">
-      <div className="p-5">
-        <span className="block text-lg font-bold mb-4">Output</span>
-        {output ? (
-          <div
-            className={`${
-              output.type === "error" ? "text-red-400" : "text-slate-800"
-            }`}
-          >
-            <ScrollArea className="h-[600px] pb-40">
-              {output.message ? (
-                Array.isArray(output.message) ? (
-                  <ul>
-                    {output.message.map((log, index) => (
-                      <li key={index}>
-                        {log.map((item, index) => (
-                          <span key={index}>
-                            {typeof item === "object" ? (
-                              <pre>{JSON.stringify(item, null, "\t")}</pre>
-                            ) : (
-                              String(item)
-                            )}
-                          </span>
-                        ))}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  output.message
-                )
-              ) : null}
-            </ScrollArea>
-          </div>
-        ) : null}
-      </div>
+    <div className={`${isError ? "text-red-400" : "text-slate-800"}`}>
+      <ScrollArea className="h-[600px] pb-40 noto-sans-mono">
+        <OutputMessages message={message} />
+      </ScrollArea>
     </div>
   );
 }
