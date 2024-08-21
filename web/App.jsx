@@ -19,7 +19,7 @@ function App() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const isProduction = process.env.REACT_APP_ENV === "production"; // NODE_ENV ??
+    const isProduction = process.env.REACT_APP_ENV === "production";
     let wsUrl = isProduction
       ? `wss://${process.env.REACT_APP_WS_SERVER}`
       : `ws://${process.env.REACT_APP_WS_SERVER}:${process.env.REACT_APP_WS_SERVER_PORT}`;
