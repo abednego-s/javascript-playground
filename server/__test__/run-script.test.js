@@ -90,3 +90,16 @@ describe("binary expression", () => {
   })
 })
 
+describe("with callback", () => {
+  test("setTimeout", () => {
+    jest.useFakeTimers()
+    const callback = jest.fn();
+    const code = `setTimeout(() => {
+      console.log("hello")
+    }, 1000)`
+    const logs = runScript(code, callback)
+    jest.runAllTimers() // fast-forward all timers
+    expect(callback).toHaveBeenCalled()
+    expect(logs).toStrictEqual([["hello"]])
+  })
+})
