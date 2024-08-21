@@ -64,7 +64,7 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    console.log("Client disconnected");
+    clients.delete(channelName)
   });
 });
 
