@@ -6,15 +6,13 @@ export function OutputMessages({ message }) {
   return (
     <ul>
       {message.map((elem, idx) => (
-        <li key={idx}>
+        <li key={idx} className="-ml-2">
           {elem.map((item, idx) => (
-            <span key={idx}>
-              {typeof item === "object" ? (
-                <pre>{JSON.stringify(item, null, "\t")}</pre>
-              ) : (
-                String(item)
-              )}
-            </span>
+            <pre className="pl-2" key={idx}>
+              {typeof item === "object" && item !== null
+                ? JSON.stringify(item, null, "\t")
+                : String(item)}
+            </pre>
           ))}
         </li>
       ))}

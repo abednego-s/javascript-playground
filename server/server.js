@@ -4,7 +4,8 @@ const bodyParser = require("body-parser")
 const path = require("path")
 const http = require("http")
 const runScript = require("./utils/run-script")
-const { createChannelName } = require("./utils/channels")
+const createChannelName = require("./utils/create-channel-name")
+const replacer = require("./utils/replacer")
 require("dotenv").config();
 require("global-jsdom/register")
 
@@ -52,7 +53,7 @@ wss.on("connection", (ws) => {
       runScript(`${data}`, (logs) => {
         clients.get(channelName).forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            const response = { type: "logs", message: logs }
+            const response = { type: "logs", message: replacer(logs) }
             client.send(JSON.stringify(response))
           }
         })
