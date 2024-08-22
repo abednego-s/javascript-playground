@@ -9,14 +9,13 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { OutputPanel } from "@/components/output-panel";
-import { useToast } from "@/components/ui/use-toast";
 
 function App() {
   const [ws, setWs] = useState(null);
   const [output, setOutput] = useState(null);
-  const [isRendered, setRendered] = useState(false);
+  const [wasInitialRequestSent, setInitialRequestSent] = useState(false);
+  const [isConnectedToWs, setConnectedToWs] = useState(false);
   const retryIntervalRef = useRef(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     const isProduction = process.env.REACT_APP_ENV === "production";
@@ -29,6 +28,7 @@ function App() {
 
       websocket.onopen = function () {
         setWs(websocket);
+        setConnectedToWs(true);
         clearInterval(retryIntervalRef.current);
         retryIntervalRef.current = null;
       };
@@ -39,8 +39,8 @@ function App() {
       };
 
       websocket.onclose = function () {
+        setConnectedToWs(false);
         retryConnection();
-        showConnectionError();
       };
     }
 
@@ -48,15 +48,6 @@ function App() {
       if (!retryIntervalRef.current) {
         retryIntervalRef.current = setInterval(connectToWs, 5000);
       }
-    }
-
-    function showConnectionError() {
-      toast({
-        variant: "destructive",
-        title: "Service has stopped",
-        description:
-          "Unable to run your code because the service is unavailable.",
-      });
     }
 
     connectToWs();
@@ -68,13 +59,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isRendered) {
+    if (wasInitialRequestSent) {
       return;
     }
 
     if (ws) {
       sendScriptToWsServer(sampleScript);
-      setRendered(true);
+      setInitialRequestSent(true);
     }
   }, [ws]);
 
@@ -118,7 +109,7 @@ function App() {
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel>
-          <OutputPanel output={output} />
+          <OutputPanel output={output} isConnectedToWs={isConnectedToWs} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </>
