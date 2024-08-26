@@ -18,21 +18,6 @@ function replacer(array) {
   }, [])
 
   return result
-  // return array.map((element) => {
-  //   if (Array.isArray(element)) {
-  //     return replacer(element)
-  //   }
-
-  //   if (element === undefined) {
-  //     return "undefined"
-  //   } else if (element === null) {
-  //     return "null"
-  //   } else if (typeof element === "function" || typeof element === "object" && element.constructor !== Object) {
-  //     return String(element)
-  //   }
-
-  //   return element
-  // })
 }
 
 module.exports = replacer
