@@ -1,3 +1,5 @@
+import { JSONTree } from "react-json-tree";
+
 export function OutputMessages({ message }) {
   if (!Array.isArray(message)) {
     return message;
@@ -8,10 +10,16 @@ export function OutputMessages({ message }) {
       {message.map((elem, idx) => (
         <li key={idx} className="-ml-2">
           {elem.map((item, idx) => (
-            <pre className="pl-2 text-sm" key={idx}>
-              {typeof item === "object"
-                ? JSON.stringify(item, null, "\t")
-                : String(item)}
+            <pre
+              id="output-message"
+              className="pl-2 mb-2 text-sm text-slate-500"
+              key={idx}
+            >
+              {typeof item === "object" ? (
+                <JSONTree data={item} />
+              ) : (
+                String(item)
+              )}
             </pre>
           ))}
         </li>
