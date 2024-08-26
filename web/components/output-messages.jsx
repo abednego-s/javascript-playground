@@ -8,8 +8,8 @@ export function OutputMessages({ message }) {
       {message.map((elem, idx) => (
         <li key={idx} className="-ml-2">
           {elem.map((item, idx) => (
-            <pre className="pl-2" key={idx}>
-              {typeof item === "object" && item !== null
+            <pre className="pl-2 text-sm" key={idx}>
+              {typeof item === "object"
                 ? JSON.stringify(item, null, "\t")
                 : String(item)}
             </pre>
