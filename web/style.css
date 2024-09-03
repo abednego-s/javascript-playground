@@ -24,21 +24,6 @@ body,
   height: 100%;
 }
 
-.noto-sans-mono {
-  font-family: "Noto Sans Mono", monospace;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-variation-settings: "wdth" 100;
-}
-
-.dm-sans {
-  font-family: "DM Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-}
-
 @keyframes rotating {
   from {
     transform: rotate(0deg);
