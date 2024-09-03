@@ -1,14 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { javascript } from "@codemirror/lang-javascript";
-import CodeMirror from "@uiw/react-codemirror";
-import { okaidia } from "@uiw/codemirror-theme-okaidia";
-import { Code2, Github } from "lucide-react";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { OutputPanel } from "@/components/output-panel";
+import { Header } from "@/components/header";
+import { Playground } from "@/components/playground";
 
 function App() {
   const [ws, setWs] = useState(null);
@@ -76,42 +68,13 @@ function App() {
 
   return (
     <>
-      <header className="p-2">
-        <nav className="flex items-center justify-between">
-          <h1 className="flex text-2xl">
-            <span className="flex items-center font-bold text-red-500">
-              <Code2 />
-              <span className="ml-2">Javascript Playground</span>
-            </span>
-            <span className="ml-2 text-slate-500">
-              — Write & run Javascript Code
-            </span>
-          </h1>
-          <ul>
-            <a
-              href="https://github.com/abednego-s/javascript-playground"
-              className="flex items-center justify-center w-12 h-12 border-2 border-black rounded-full"
-            >
-              <Github size={28} />
-            </a>
-          </ul>
-        </nav>
-      </header>
-
-      <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel>
-          <CodeMirror
-            value={sampleScript}
-            onChange={sendScriptToWsServer}
-            extensions={[javascript()]}
-            theme={okaidia}
-          />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel>
-          <OutputPanel output={output} isConnectedToWs={isConnectedToWs} />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+      <Header />
+      <Playground
+        isConnectedToWs={isConnectedToWs}
+        onCodeEditorChange={sendScriptToWsServer}
+        output={output}
+        sampleScript={sampleScript}
+      />
     </>
   );
 }
