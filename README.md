@@ -4,10 +4,10 @@ Fast and minimalist Javascript Playground. Write & run your code online with liv
 
 ## Site
 
-Live website : https://javascript-playground.koyeb.app/
+Live website: https://javascript-playground.koyeb.app/
 
 ## Bug / Feature Request
 
-If you find a bug or seeing an unexpected results, please submit an issue [here](https://github.com/abednego-s/javascript-playground/issues/new), by including your sample code and the expected result.
+Something isn't quite right? Please submit an issue [here](https://github.com/abednego-s/javascript-playground/issues/new) by including your sample code and the expected result.
 
-If you want to request a new function, please open an issue [here](https://github.com/abednego-s/javascript-playground/issues/new).
+If you want new features to be added to the site, please open an issue [here](https://github.com/abednego-s/javascript-playground/issues/new).
