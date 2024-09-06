@@ -3,10 +3,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const Dotenv = require("dotenv-webpack")
 
 module.exports = {
-  entry: path.join(__dirname, "web", "index.js"),
+  entry: path.resolve(__dirname, "web", "index.js"),
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(__dirname, "web", "index.html"),
+      template: path.resolve(__dirname, "web", "index.html"),
     }),
     new Dotenv(),
   ],
@@ -29,7 +29,7 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
     alias: {
-      "@": path.resolve(__dirname, "./web")
+      "@": path.resolve(__dirname, "web")
     }
   }
 };
