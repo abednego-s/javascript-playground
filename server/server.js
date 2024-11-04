@@ -6,7 +6,7 @@ const http = require("http")
 const runScript = require("./utils/run-script")
 const createChannelName = require("./utils/create-channel-name")
 const replacer = require("./utils/replacer")
-require("dotenv").config();
+require("dotenv").config()
 require("global-jsdom/register")
 
 const app = express()
@@ -15,10 +15,10 @@ const wss = new WebSocket.Server({ server })
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json())
-app.use(express.static(path.resolve(__dirname, "..", "public", "web")))
+app.use(express.static(path.resolve(__dirname, "../public/web")))
 
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "..", "public", "web", "index.html"))
+  res.sendFile(path.resolve(__dirname, "../public/web/index.html"))
 })
 
 let wsServer = null
