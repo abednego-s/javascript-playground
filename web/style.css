@@ -36,7 +36,3 @@ body,
 .rotating {
   animation: rotating 2s linear infinite;
 }
-
-#output-message > ul {
-  background-color: transparent !important;
-}

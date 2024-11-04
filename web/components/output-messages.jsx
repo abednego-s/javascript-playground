@@ -1,4 +1,4 @@
-import { JSONTree } from "react-json-tree";
+import { objectLiteralToString } from "@/lib/object-literal-to-string";
 
 export function OutputMessages({ message }) {
   if (!Array.isArray(message)) {
@@ -15,11 +15,9 @@ export function OutputMessages({ message }) {
               className="pl-2 mb-2 text-sm text-slate-500"
               key={idx}
             >
-              {typeof item === "object" ? (
-                <JSONTree data={item} />
-              ) : (
-                String(item)
-              )}
+              {typeof item === "object"
+                ? objectLiteralToString(item)
+                : String(item)}
             </pre>
           ))}
         </li>
