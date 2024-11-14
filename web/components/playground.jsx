@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/resizable";
 import { OutputPanel } from "@/components/output-panel";
 
-export function Playground({
+export default function Playground({
   isConnectedToWs,
   onCodeEditorChange,
   output,

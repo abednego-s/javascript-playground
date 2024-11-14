@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { Header } from "@/components/header";
-import { Playground } from "@/components/playground";
+import { LoadingPlayground } from "@/components/loading-playground";
+
+const Playground = lazy(() => import("./components/playground"));
 
 function App() {
   const [ws, setWs] = useState(null);
@@ -69,12 +71,14 @@ function App() {
   return (
     <>
       <Header />
-      <Playground
-        isConnectedToWs={isConnectedToWs}
-        onCodeEditorChange={sendScriptToWsServer}
-        output={output}
-        sampleScript={sampleScript}
-      />
+      <Suspense fallback={<LoadingPlayground />}>
+        <Playground
+          isConnectedToWs={isConnectedToWs}
+          onCodeEditorChange={sendScriptToWsServer}
+          output={output}
+          sampleScript={sampleScript}
+        />
+      </Suspense>
     </>
   );
 }
