@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "dev": "npx lerna run dev",
-    "build-client": "npm run build --workspace=web",
+    "build-client": "npm run build --workspace=client",
     "start-server": "npm run start --workspace=server",
     "start": "npm run build-client && npm run start-server"
   }
