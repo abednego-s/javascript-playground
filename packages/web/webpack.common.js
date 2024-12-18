@@ -3,10 +3,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const Dotenv = require("dotenv-webpack")
 
 module.exports = {
-  entry: path.resolve(__dirname, "web", "index.js"),
+  entry: path.resolve(__dirname, "index.js"),
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "web", "index.html"),
+      template: path.resolve(__dirname, "index.html"),
     }),
     new Dotenv(),
   ],
@@ -21,7 +21,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        include: path.resolve(__dirname, "web"),
+        include: path.resolve(__dirname),
         use: ["style-loader", "css-loader", "postcss-loader"],
       },
     ]
@@ -29,7 +29,7 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
     alias: {
-      "@": path.resolve(__dirname, "web")
+      "@": path.resolve(__dirname)
     }
   }
 };
