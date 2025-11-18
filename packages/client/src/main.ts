@@ -1,5 +1,9 @@
 import "./style.css";
+import { EditorView, basicSetup } from "codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { okaidia } from "@uiw/codemirror-theme-okaidia";
 import { debounce } from "./utils/debounce";
+import { ResizablePanel } from "./utils/resizable-panel";
 
 const isProduction = import.meta.env.MODE === "production";
 const wsUrl = isProduction
@@ -7,9 +11,30 @@ const wsUrl = isProduction
   : `ws://${import.meta.env.VITE_WS_SERVER}:${
       import.meta.env.VITE_WS_SERVER_PORT
     }`;
+const codeEditor = document.getElementById("code-editor")!;
+const output = document.getElementById("output")!;
+
 const ws = connectToWs();
-const codeEditor = document.getElementById("code-editor");
-const output = document.getElementById("output") as HTMLDivElement;
+createCodeEditor();
+createResizable();
+
+function createCodeEditor() {
+  return new EditorView({
+    doc: "console.log('Hello, World!');",
+    parent: codeEditor,
+    extensions: [
+      basicSetup,
+      javascript(),
+      okaidia,
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          const value = update.state.doc.toString();
+          runCode(value);
+        }
+      }),
+    ],
+  });
+}
 
 function connectToWs() {
   const websocket = new WebSocket(wsUrl);
@@ -37,6 +62,10 @@ function connectToWs() {
   return websocket;
 }
 
+function createResizable() {
+  return new ResizablePanel("resizableContainer");
+}
+
 // function retryConnection() {
 //   setInterval(connectToWs, 5000)
 // }
@@ -57,8 +86,3 @@ function runCode(e: string) {
   output.innerHTML = "";
   debounced(e);
 }
-
-codeEditor?.addEventListener("input", (event) => {
-  const target = event.target as HTMLInputElement;
-  runCode(target.value);
-});
