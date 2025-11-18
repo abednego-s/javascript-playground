@@ -11,8 +11,24 @@
   </head>
   <body>
     <div id="app">
-      <textarea id="code-editor"></textarea>
-      <div id="output"></div>
+      <div class="header">
+        <h1>
+          Javascript Playground<span> — Write & run Javascript Code</span>
+        </h1>
+        <a href="https://github.com/abednego-s/javascript-playground">Github</a>
+      </div>
+
+      <div class="container">
+        <div class="resizable-container" id="resizableContainer">
+          <div class="panel panel-left" id="leftPanel">
+            <div id="code-editor"></div>
+          </div>
+          <div class="resizer" id="resizer"></div>
+          <div class="panel panel-right" id="rightPanel">
+            <div id="output"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

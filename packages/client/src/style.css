@@ -1,12 +1,145 @@
-:root {
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 0 20px;
+}
+
+.header {
+  text-align: center;
+  padding: 20px 0;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.header h1 span {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.header a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+}
+
+.resizable-container {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel {
+  height: 100%;
+  overflow-y: auto;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.panel-left {
+  background: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  min-width: 200px;
+  max-width: 80%;
+}
+
+.panel-right {
+  background: white;
+  flex: 1;
+}
+
+.resizer {
+  width: 8px;
+  background: linear-gradient(90deg, #e9ecef 0%, #dee2e6 50%, #e9ecef 100%);
+  cursor: col-resize;
+  position: relative;
+  transition: background 0.3s ease;
+  user-select: none;
+}
+
+.resizer:hover {
+  background: linear-gradient(90deg, #adb5bd 0%, #868e96 50%, #adb5bd 100%);
+}
+
+.resizer.dragging {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.resizer::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 30px;
+  background: #6c757d;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.resizer:hover::before {
+  background: white;
+  height: 40px;
+}
+
+.resizer.dragging::before {
+  background: white;
+  height: 50px;
+}
+
+.panel.collapsed {
+  width: 0 !important;
+  padding: 0;
+  overflow: hidden;
+}
+
+.panel.collapsed + .resizer {
+  width: 0;
+  cursor: default;
+}
+
+.panel.collapsed + .resizer::before {
+  display: none;
+}
+
+#code-editor {
+  height: 100%;
+}
+
+.cm-editor {
+  height: 100%;
+}
+.cm-scroller {
+  overflow: auto;
 }
