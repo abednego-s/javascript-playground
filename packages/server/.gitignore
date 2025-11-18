@@ -1,3 +1,4 @@
+static
 coverage
 .vscode/*
 !.vscode/extensions.json

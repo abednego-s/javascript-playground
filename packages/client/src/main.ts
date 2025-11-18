@@ -7,6 +7,9 @@ const wsUrl = isProduction
   : `ws://${import.meta.env.VITE_WS_SERVER}:${
       import.meta.env.VITE_WS_SERVER_PORT
     }`;
+const ws = connectToWs();
+const codeEditor = document.getElementById("code-editor");
+const output = document.getElementById("output") as HTMLDivElement;
 
 function connectToWs() {
   const websocket = new WebSocket(wsUrl);
@@ -21,8 +24,8 @@ function connectToWs() {
 
   websocket.onmessage = function (e) {
     const parsed = JSON.parse(e.data);
-    console.log(parsed);
-    // setOutput(parsed);
+    console.log("[PARSED]: ", parsed);
+    output.innerHTML += parsed.message;
   };
 
   websocket.onclose = function () {
@@ -38,16 +41,24 @@ function connectToWs() {
 //   setInterval(connectToWs, 5000)
 // }
 
-const ws = connectToWs();
-
-const codeEditor = document.getElementById("code-editor");
-
 const debounced = debounce((e) => {
-  console.log(e);
+  console.log("[HITTING API: ]", e);
   ws.send(e);
 }, 500);
 
+function runCode(e: string) {
+  try {
+    new Function(e)();
+  } catch (error) {
+    output.innerHTML = `${error}`;
+    return false;
+  }
+
+  output.innerHTML = "";
+  debounced(e);
+}
+
 codeEditor?.addEventListener("input", (event) => {
   const target = event.target as HTMLInputElement;
-  debounced(target.value);
+  runCode(target.value);
 });
