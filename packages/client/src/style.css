@@ -143,25 +143,10 @@ body {
 .cm-scroller {
   overflow: auto;
 }
-
 #output {
-  padding: 10px;
-}
-
-#output ul {
-  list-style-type: none;
-}
-
-#output ul li {
-  font-size: 14px;
-  padding: 5px 0;
-  border-bottom: 1px solid rgb(222, 222, 222);
-}
-
-#output ul li.error {
-  color: rgba(237, 71, 71, 0.799);
-}
-
-#output ul li.log {
-  color: rgb(39, 39, 39);
+  background: #000;
+  position: relative;
+  overflow-x: hidden;
+  height: 100%;
+  padding: 15px;
 }
