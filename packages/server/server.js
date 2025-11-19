@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
 });
 
 const clients = new Map();
+const commandQueue = [];
 
 wss.on("connection", async (ws) => {
   const sandbox = await Sandbox.create();
@@ -38,10 +39,14 @@ wss.on("connection", async (ws) => {
   }
 
   ws.on("message", async (rawData) => {
-    const isSandboxRunning = await sandbox.isRunning();
+    const code = String(rawData);
 
-    if (!isSandboxRunning) {
+    if (!(await sandbox.isRunning())) {
       ws.close(1000, "Sandbox is not running, disconnect websocket.");
+      return;
+    }
+
+    if (!code) {
       return;
     }
 
@@ -56,7 +61,14 @@ wss.on("connection", async (ws) => {
     }
 
     try {
-      await sandbox.commands.run(`node ${FILE_PATH}`, {
+      if (commandQueue.length > 0) {
+        commandQueue.forEach((cmd) => {
+          cmd.kill();
+        });
+        commandQueue.length = 0;
+      }
+
+      const command = await sandbox.commands.run(`node ${FILE_PATH}`, {
         background: true,
         onStdout: (data) => {
           const response = { type: "log", message: `${data}` };
@@ -67,6 +79,7 @@ wss.on("connection", async (ws) => {
           sendToClient(response);
         },
       });
+      commandQueue.push(command);
     } catch (error) {
       console.error("Error executing node", error);
     }
