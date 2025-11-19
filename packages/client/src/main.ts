@@ -53,7 +53,7 @@ function connectToWs() {
       message: string;
     };
     console.log("[PARSED]: ", parsed);
-    if (parsed.message) {
+    if (parsed.message.replace(/(\r\n|\n|\r)/gm, "")) {
       terminal.writeln(`${parsed.message}`);
     }
   };
