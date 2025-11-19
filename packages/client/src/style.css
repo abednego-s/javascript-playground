@@ -5,14 +5,14 @@
 }
 
 body {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Onest", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgb(32, 32, 32);
   min-height: 100vh;
   padding: 0 20px;
 }
@@ -149,4 +149,10 @@ body {
   overflow-x: hidden;
   height: 100%;
   padding: 15px;
+}
+
+.xterm-rows,
+.cm-scroller {
+  font-size: 13px !important;
+  font-family: "Source Code Pro", "Courier New", Courier, monospace !important;
 }
