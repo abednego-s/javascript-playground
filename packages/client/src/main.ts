@@ -53,7 +53,9 @@ function connectToWs() {
       message: string;
     };
     console.log("[PARSED]: ", parsed);
-    terminal.writeln(`${parsed.message}`);
+    if (parsed.message) {
+      terminal.writeln(`${parsed.message}`);
+    }
   };
 
   websocket.onclose = function () {
@@ -80,13 +82,6 @@ function createTerminal() {
 }
 
 const sendToWsServer = debounce((code) => {
-  if (!code) return;
-  try {
-    new Function(code)();
-  } catch (error) {
-    terminal.writeln(`\x1b[31m${error}\x1b[0m`);
-    return false;
-  }
   ws.send(code);
 }, 1000);
 
