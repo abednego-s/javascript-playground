@@ -1,11 +1,12 @@
-import "./style.css";
-import "./xterm.css";
 import { EditorView, basicSetup } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { okaidia } from "@uiw/codemirror-theme-okaidia";
 import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
 import { debounce } from "./utils/debounce";
 import { ResizablePanel } from "./utils/resizable-panel";
+import "./style.css";
+import "./xterm.css";
 
 const isProduction = import.meta.env.MODE === "production";
 const wsUrl = isProduction
@@ -15,11 +16,11 @@ const wsUrl = isProduction
     }`;
 const codeEditorElem = document.getElementById("code-editor")!;
 const outputElem = document.getElementById("output")!;
+
 const ws = connectToWs();
 createCodeEditor();
 createResizable();
-const term = createTerminal();
-term.write("Hello, World!");
+const terminal = createTerminal();
 
 function createCodeEditor() {
   return new EditorView({
@@ -52,7 +53,7 @@ function connectToWs() {
       message: string;
     };
     console.log("[PARSED]: ", parsed);
-    term.writeln(`${parsed.message}`);
+    terminal.writeln(`${parsed.message}`);
   };
 
   websocket.onclose = function () {
@@ -68,9 +69,13 @@ function createResizable() {
 
 function createTerminal() {
   const term = new Terminal({
+    cursorBlink: true,
     convertEol: true,
   });
+  const fitAddon = new FitAddon();
   term.open(outputElem);
+  term.loadAddon(fitAddon);
+  fitAddon.fit();
   return term;
 }
 
@@ -79,8 +84,7 @@ const sendToWsServer = debounce((code) => {
   try {
     new Function(code)();
   } catch (error) {
-    term.writeln(`${error}`);
-    // output.write({ type: "error", message: `${error}` });
+    terminal.writeln(`\x1b[31m${error}\x1b[0m`);
     return false;
   }
   ws.send(code);
@@ -89,3 +93,5 @@ const sendToWsServer = debounce((code) => {
 function runCode(code: string) {
   sendToWsServer(code);
 }
+
+terminal.writeln("Hello, World!");
