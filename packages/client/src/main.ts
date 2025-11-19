@@ -11,9 +11,8 @@ const wsUrl = isProduction
   : `ws://${import.meta.env.VITE_WS_SERVER}:${
       import.meta.env.VITE_WS_SERVER_PORT
     }`;
-const codeEditor = document.getElementById("code-editor")!;
-const output = document.getElementById("output")!;
-
+const codeEditorElem = document.getElementById("code-editor")!;
+const outputElem = document.getElementById("output")!;
 const ws = connectToWs();
 createCodeEditor();
 createResizable();
@@ -21,7 +20,7 @@ createResizable();
 function createCodeEditor() {
   return new EditorView({
     doc: "console.log('Hello, World!');",
-    parent: codeEditor,
+    parent: codeEditorElem,
     extensions: [
       basicSetup,
       javascript(),
@@ -29,6 +28,7 @@ function createCodeEditor() {
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           const value = update.state.doc.toString();
+          output.clear();
           runCode(value);
         }
       }),
@@ -40,7 +40,7 @@ function connectToWs() {
   const websocket = new WebSocket(wsUrl);
 
   websocket.onopen = function () {
-    console.log("connected to ws: ", wsUrl);
+    console.log("[websocket]: ", wsUrl);
     // setWs(websocket);
     // setConnectedToWs(true);
     // clearInterval(retryIntervalRef.current);
@@ -48,15 +48,19 @@ function connectToWs() {
   };
 
   websocket.onmessage = function (e) {
-    const parsed = JSON.parse(e.data);
+    const parsed = JSON.parse(e.data) as {
+      type: "log" | "error";
+      message: string;
+    };
     console.log("[PARSED]: ", parsed);
-    output.innerHTML += parsed.message;
+    output.write(parsed);
+    // proxiedLogs.push(parsed);
   };
 
   websocket.onclose = function () {
     console.log("Connection closed!");
     // setConnectedToWs(false);
-    //   retryConnection();
+    // retryConnection();
   };
 
   return websocket;
@@ -70,19 +74,43 @@ function createResizable() {
 //   setInterval(connectToWs, 5000)
 // }
 
-const debounced = debounce((e) => {
-  console.log("[HITTING API: ]", e);
-  ws.send(e);
-}, 500);
+const sendToWsServer = debounce((code) => {
+  if (!code) return;
+  ws.send(code);
+}, 1000);
 
-function runCode(e: string) {
+function runCode(code: string) {
   try {
-    new Function(e)();
+    new Function(code)();
   } catch (error) {
-    output.innerHTML = `${error}`;
+    output.write({ type: "error", message: `${error}` });
     return false;
   }
-
-  output.innerHTML = "";
-  debounced(e);
+  sendToWsServer(code);
 }
+const output = {
+  write(output: { type: "log" | "error"; message: string }) {
+    if (output.type === "error") {
+      const ul = document.createElement("ul");
+      const li = document.createElement("li");
+      li.classList.add(output.type);
+      li.innerText = output.message;
+      ul.appendChild(li);
+      outputElem.appendChild(ul);
+      return;
+    }
+
+    const ul =
+      outputElem.children.length === 0
+        ? document.createElement("ul")
+        : outputElem.getElementsByTagName("ul")[0];
+    const li = document.createElement("li");
+    li.classList.add(output.type);
+    li.innerText = output.message;
+    ul.appendChild(li);
+    outputElem.appendChild(ul);
+  },
+  clear() {
+    outputElem.replaceChildren();
+  },
+};

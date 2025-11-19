@@ -3,12 +3,8 @@ const WebSocket = require("ws");
 const bodyParser = require("body-parser");
 const path = require("path");
 const http = require("http");
-// const runScript = require("./utils/run-script")
-// const createChannelName = require("./utils/create-channel-name");
-// const replacer = require("./utils/replacer");
-require("dotenv").config();
-// require("global-jsdom/register")
 const { Sandbox } = require("@e2b/code-interpreter");
+require("dotenv").config();
 
 const app = express();
 const server = http.createServer(app);
@@ -24,28 +20,6 @@ app.get("/", (req, res) => {
 
 const clients = new Map();
 
-// process.on("uncaughtException", (error) => {
-//   const response = { type: "error", message: error.message }
-//   if (wsServer) {
-//     wsServer.send(JSON.stringify(response));
-//   }
-// });
-
-// process.on("unhandledRejection", (reason) => {
-//   const response = { type: "error", message: reason.message }
-//   if (wsServer) {
-//     wsServer.send(JSON.stringify(response));
-//   }
-// });
-
-function sendToClient(data) {
-  clients.get(channelName).forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(data));
-    }
-  });
-}
-
 wss.on("connection", async (ws) => {
   const sandbox = await Sandbox.create();
   const channelName = sandbox.getHost();
@@ -55,23 +29,34 @@ wss.on("connection", async (ws) => {
     clients.set(channelName, [ws]);
   }
 
+  function sendToClient(data) {
+    clients.get(channelName).forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(data));
+      }
+    });
+  }
+
   ws.on("message", async (rawData) => {
     const isSandboxRunning = await sandbox.isRunning();
 
     if (!isSandboxRunning) {
-      throw new Error("Sandbox is not running");
+      ws.close(1000, "Sandbox is not running, disconnect websocket.");
+      return;
     }
 
     const FILE_PATH = "/home/user/app/index.js";
 
+    console.log(`[HITTING API]`);
+
     try {
       await sandbox.files.write(FILE_PATH, `${rawData}`);
     } catch (error) {
-      throw new Error("Unable to write to disk", error);
+      console.error("Unable to write file", error);
     }
 
     try {
-      await sandbox.commands.run(FILE_PATH, {
+      await sandbox.commands.run(`node ${FILE_PATH}`, {
         background: true,
         onStdout: (data) => {
           const response = { type: "log", message: `${data}` };
@@ -83,22 +68,8 @@ wss.on("connection", async (ws) => {
         },
       });
     } catch (error) {
-      throw new Error("Error executing node", error);
+      console.error("Error executing node", error);
     }
-
-    // try {
-    //   runScript(`${data}`, (logs) => {
-    //     clients.get(channelName).forEach((client) => {
-    //       if (client.readyState === WebSocket.OPEN) {
-    //         const response = { type: "logs", message: replacer(logs) };
-    //         client.send(JSON.stringify(response));
-    //       }
-    //     });
-    //   });
-    // } catch (error) {
-    //   const response = { type: "error", message: `${error}` };
-    //   ws.send(JSON.stringify(response));
-    // }
   });
 
   ws.on("close", () => {
