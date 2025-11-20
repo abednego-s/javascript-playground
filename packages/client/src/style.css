@@ -12,7 +12,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: rgb(32, 32, 32);
+  background: rgb(26, 26, 26);
   min-height: 100vh;
   padding: 0 20px;
 }
@@ -28,11 +28,11 @@ body {
 
 .header h1 {
   margin: 0;
-  font-size: 30px;
+  font-size: 25px;
 }
 
 .header h1 span {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -68,7 +68,6 @@ body {
 
 .panel-left {
   background: #f8f9fa;
-  border-right: 1px solid #e9ecef;
   min-width: 200px;
   max-width: 80%;
 }
@@ -80,7 +79,7 @@ body {
 
 .resizer {
   width: 8px;
-  background: linear-gradient(90deg, #e9ecef 0%, #dee2e6 50%, #e9ecef 100%);
+  background: rgb(59, 57, 57);
   cursor: col-resize;
   position: relative;
   transition: background 0.3s ease;
@@ -88,11 +87,11 @@ body {
 }
 
 .resizer:hover {
-  background: linear-gradient(90deg, #adb5bd 0%, #868e96 50%, #adb5bd 100%);
+  background: rgb(74, 74, 74);
 }
 
 .resizer.dragging {
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: rgb(44, 58, 65);
 }
 
 .resizer::before {

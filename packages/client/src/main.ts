@@ -52,12 +52,14 @@ function connectToWebSocket() {
       type: "log" | "error";
       message: string;
     };
-    console.log("[PARSED]: ", parsed);
     terminal.write(`${parsed.message}`);
   };
 
   websocket.onclose = function () {
     console.log("Connection closed!");
+    terminal.writeln(
+      "\x1b[31mService disconnected. Please refresh the page.\x1b[0m"
+    );
   };
 
   return websocket;
@@ -87,7 +89,7 @@ function runCode(code: string) {
   sendToWsServer(code);
 }
 
-terminal.write("Hello, World!");
+terminal.writeln("Hello, World!");
 
 const worker = new Worker(new URL("./worker.ts", import.meta.url), {
   type: "module",
