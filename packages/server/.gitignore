@@ -1,5 +1,6 @@
 static
 coverage
+dist
 .vscode/*
 !.vscode/extensions.json
 .idea
