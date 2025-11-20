@@ -18,75 +18,68 @@ app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "static", "index.html"));
 });
 
-const clients = new Map();
-const commandQueue = [];
+const APP_PATH = "/home/user/app";
+const SCRIPT_PATH = `${APP_PATH}/index.js`;
+const MANIFEST_PATH = `${APP_PATH}/package.json`;
+
+function sendToClient(ws, data) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(data));
+  }
+}
 
 wss.on("connection", async (ws) => {
   const sandbox = await Sandbox.create();
-  const channelName = sandbox.getHost();
-  if (clients.has(channelName)) {
-    clients.set(channelName, [...clients.get(channelName), ws]);
-  } else {
-    clients.set(channelName, [ws]);
-  }
-
-  function sendToClient(data) {
-    clients.get(channelName).forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(data));
-      }
-    });
-  }
+  const runningSandboxCommands = [];
 
   ws.on("message", async (rawData) => {
     const code = String(rawData);
+    const isSandboxRunning = await sandbox.isRunning();
 
-    if (!(await sandbox.isRunning())) {
+    if (!isSandboxRunning) {
       ws.close(1000, "Sandbox is not running, disconnect websocket.");
       return;
+    }
+
+    if (runningSandboxCommands.length > 0) {
+      runningSandboxCommands.forEach((cmd) => {
+        cmd.kill();
+      });
+      runningSandboxCommands.length = 0;
     }
 
     if (!code) {
       return;
     }
 
-    const FILE_PATH = "/home/user/app/index.js";
-
-    console.log(`[HITTING API]`);
-
     try {
-      await sandbox.files.write(FILE_PATH, `${rawData}`);
+      await sandbox.files.write([
+        { path: SCRIPT_PATH, data: code },
+        { path: MANIFEST_PATH, data: JSON.stringify({ type: "module" }) },
+      ]);
     } catch (error) {
       console.error("Unable to write file", error);
     }
 
     try {
-      if (commandQueue.length > 0) {
-        commandQueue.forEach((cmd) => {
-          cmd.kill();
-        });
-        commandQueue.length = 0;
-      }
-
-      const command = await sandbox.commands.run(`node ${FILE_PATH}`, {
+      const command = await sandbox.commands.run(`node ${SCRIPT_PATH}`, {
         background: true,
         onStdout: (data) => {
           const response = { type: "log", message: `${data}` };
-          sendToClient(response);
+          sendToClient(ws, response);
         },
         onStderr: (error) => {
           const response = { type: "error", message: `${error}` };
-          sendToClient(response);
+          sendToClient(ws, response);
         },
       });
-      commandQueue.push(command);
+      runningSandboxCommands.push(command);
     } catch (error) {
       console.error("Error executing node", error);
     }
   });
 
   ws.on("close", () => {
-    clients.delete(channelName);
     sandbox.kill();
   });
 });
