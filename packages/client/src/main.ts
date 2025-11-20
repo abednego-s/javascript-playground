@@ -17,7 +17,7 @@ const wsUrl = isProduction
 const codeEditorElem = document.getElementById("code-editor")!;
 const outputElem = document.getElementById("output")!;
 
-const ws = connectToWs();
+const ws = connectToWebSocket();
 createCodeEditor();
 createResizable();
 const terminal = createTerminal();
@@ -40,7 +40,7 @@ function createCodeEditor() {
   });
 }
 
-function connectToWs() {
+function connectToWebSocket() {
   const websocket = new WebSocket(wsUrl);
 
   websocket.onopen = function () {
@@ -53,9 +53,7 @@ function connectToWs() {
       message: string;
     };
     console.log("[PARSED]: ", parsed);
-    if (parsed.message.replace(/(\r\n|\n|\r)/gm, "")) {
-      terminal.write(`${parsed.message}`);
-    }
+    terminal.write(`${parsed.message}`);
   };
 
   websocket.onclose = function () {
@@ -89,4 +87,18 @@ function runCode(code: string) {
   sendToWsServer(code);
 }
 
-terminal.writeln("Hello, World!");
+terminal.write("Hello, World!");
+
+const worker = new Worker(new URL("./worker.ts", import.meta.url), {
+  type: "module",
+});
+
+worker.onmessage = function (e) {
+  console.log(e.data);
+
+  if (e.data.type === "timer_expired") {
+    terminal.write("Service disconnected. Please refresh the page.");
+  }
+};
+
+worker.postMessage("start_timer");
